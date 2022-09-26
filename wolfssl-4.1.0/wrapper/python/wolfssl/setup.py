@@ -63,19 +63,19 @@ INFO = dict(
 
 def update_certs():
     c_certs_dir = "../../../certs"
-    py_certs_dir = "certs"
-    certs = [
-        "ca-cert.pem",
-        "client-cert.pem",
-        "client-key.pem",
-        "server-cert.pem",
-        "server-key.pem",
-        "external/ca-digicert-ev.pem"
-    ]
-
     if os.path.isdir(c_certs_dir):
+        py_certs_dir = "certs"
         if not os.path.isdir(py_certs_dir):
             os.makedirs(py_certs_dir)
+
+        certs = [
+            "ca-cert.pem",
+            "client-cert.pem",
+            "client-key.pem",
+            "server-cert.pem",
+            "server-key.pem",
+            "external/ca-digicert-ev.pem"
+        ]
 
         for cert in certs:
             shutil.copy(os.path.join(c_certs_dir, cert), py_certs_dir)

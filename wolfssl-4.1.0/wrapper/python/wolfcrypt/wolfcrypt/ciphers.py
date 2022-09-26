@@ -50,21 +50,19 @@ class _Cipher(object):
         if mode not in _FEEDBACK_MODES:
             raise ValueError("this mode is not supported")
 
-        if mode == MODE_CBC:
-            if IV is None:
-                raise ValueError("this mode requires an 'IV' string")
-        else:
+        if mode != MODE_CBC:
             raise ValueError("this mode is not supported by this cipher")
 
+        if IV is None:
+            raise ValueError("this mode requires an 'IV' string")
         if self.key_size:
             if self.key_size != len(key):
                 raise ValueError("key must be %d in length" % self.key_size)
         elif self._key_sizes:
             if len(key) not in self._key_sizes:
-                raise ValueError("key must be %s in length" % self._key_sizes)
-        else:
-            if not len(key):
-                raise ValueError("key must not be 0 in length")
+                raise ValueError(f"key must be {self._key_sizes} in length")
+        elif not len(key):
+            raise ValueError("key must not be 0 in length")
 
         if IV is not None and len(IV) != self.block_size:
             raise ValueError("IV must be %d in length" % self.block_size)
@@ -74,10 +72,7 @@ class _Cipher(object):
         self._dec = None
         self._key = t2b(key)
 
-        if IV:
-            self._IV = t2b(IV)
-        else:
-            self._IV = t2b("\0" * self.block_size)
+        self._IV = t2b(IV) if IV else t2b("\0" * self.block_size)
 
 
     @classmethod
