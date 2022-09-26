@@ -196,14 +196,13 @@ class SSLContext(object):
             raise NotImplementedError("password callback support not "
                                       "implemented yet")
 
-        if certfile is not None:
-            ret = _lib.wolfSSL_CTX_use_certificate_chain_file(
-                self.native_object, t2b(certfile))
-            if ret != _SSL_SUCCESS:
-                raise SSLError("Unnable to load certificate chain. Err %d"% ret)
-        else:
+        if certfile is None:
             raise TypeError("certfile should be a valid filesystem path")
 
+        ret = _lib.wolfSSL_CTX_use_certificate_chain_file(
+            self.native_object, t2b(certfile))
+        if ret != _SSL_SUCCESS:
+            raise SSLError("Unnable to load certificate chain. Err %d"% ret)
         if keyfile is not None:
             ret = _lib.wolfSSL_CTX_use_PrivateKey_file(
                 self.native_object, t2b(keyfile), _SSL_FILETYPE_PEM)
@@ -380,7 +379,7 @@ class SSLSocket(socket):
 
     def _check_closed(self, call=None):
         if self.native_object == _ffi.NULL:
-            raise ValueError("%s on closed or unwrapped secure channel" % call)
+            raise ValueError(f"{call} on closed or unwrapped secure channel")
 
     def _check_connected(self):
         if not self._connected:
@@ -414,12 +413,14 @@ class SSLSocket(socket):
 
     def sendall(self, data, flags=0):
         if flags != 0:
-            raise NotImplementedError("non-zero flags not allowed in calls to "
-                                      "sendall() on %s" % self.__class__)
+            raise NotImplementedError(
+                f"non-zero flags not allowed in calls to sendall() on {self.__class__}"
+            )
 
-        length = len(data)
+
         sent = 0
 
+        length = len(data)
         while sent < length:
             sent += self.write(data[sent:])
 
@@ -495,8 +496,9 @@ class SSLSocket(socket):
 
 
     def recvmsg(self, *args, **kwargs):
-        raise NotImplementedError("recvmsg not allowed on instances of %s" %
-                                  self.__class__)
+        raise NotImplementedError(
+            f"recvmsg not allowed on instances of {self.__class__}"
+        )
 
 
     def recvmsg_into(self, *args, **kwargs):
